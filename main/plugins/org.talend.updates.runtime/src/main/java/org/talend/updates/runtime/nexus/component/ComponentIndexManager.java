@@ -108,6 +108,7 @@ public class ComponentIndexManager {
             readAttribute(ComponentIndexNames.bundle_id, element, indexBean);
             readAttribute(ComponentIndexNames.version, element, indexBean);
             readAttribute(ComponentIndexNames.mvn_uri, element, indexBean);
+            readAttribute(ComponentIndexNames.image_mvn_uri, element, indexBean);
             readAttribute(ComponentIndexNames.product, element, indexBean);
             readAttribute(ComponentIndexNames.license_uri, element, indexBean);
 

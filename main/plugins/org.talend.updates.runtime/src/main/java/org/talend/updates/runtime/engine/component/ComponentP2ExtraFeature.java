@@ -37,6 +37,7 @@ import org.eclipse.equinox.p2.metadata.IInstallableUnit;
 import org.eclipse.equinox.p2.operations.InstallOperation;
 import org.eclipse.equinox.p2.operations.ProfileModificationJob;
 import org.eclipse.equinox.p2.operations.ProvisioningSession;
+import org.eclipse.swt.graphics.Image;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
@@ -71,7 +72,7 @@ public class ComponentP2ExtraFeature extends P2ExtraFeature {
 
     public static final String COMPONENT_GROUP_ID = "org.talend.components"; //$NON-NLS-1$
 
-    private String product, mvnURI;
+    private String product, mvnURI, imageMvnURI;
 
     private URI repositoryURI;
 
@@ -79,13 +80,15 @@ public class ComponentP2ExtraFeature extends P2ExtraFeature {
 
     private File tmpM2RepoFolder;
 
+    private Image image;
+
     public ComponentP2ExtraFeature() {
         needRestart = false;
     }
 
     public ComponentP2ExtraFeature(ComponentIndexBean indexBean) {
-        this(indexBean.getName(), indexBean.getVersion(), indexBean.getDescription(), indexBean.getProduct(), indexBean
-                .getMvnURI(), indexBean.getBundleId());
+        this(indexBean.getName(), indexBean.getVersion(), indexBean.getDescription(), indexBean.getProduct(),
+                indexBean.getMvnURI(), indexBean.getImageMvnURI(), indexBean.getBundleId());
     }
 
     public ComponentP2ExtraFeature(File componentZipFile) {
@@ -93,12 +96,14 @@ public class ComponentP2ExtraFeature extends P2ExtraFeature {
         this.repositoryURI = PathUtils.getP2RepURIFromCompFile(componentZipFile);
     }
 
-    public ComponentP2ExtraFeature(String name, String version, String description, String product, String mvnURI, String p2IuId) {
+    public ComponentP2ExtraFeature(String name, String version, String description, String product, String mvnURI,
+            String imageMvnURI, String p2IuId) {
         this.name = name;
         this.version = version;
         this.description = description;
         this.product = product;
         this.mvnURI = mvnURI;
+        this.imageMvnURI = imageMvnURI;
         this.p2IuId = p2IuId;
 
         this.useLegacyP2Install = true; // enable to modify the config.ini
@@ -151,6 +156,10 @@ public class ComponentP2ExtraFeature extends P2ExtraFeature {
 
     public String getMvnURI() {
         return mvnURI;
+    }
+
+    public String getImageMvnURI() {
+        return imageMvnURI;
     }
 
     public void setLogin(boolean isLogin) {

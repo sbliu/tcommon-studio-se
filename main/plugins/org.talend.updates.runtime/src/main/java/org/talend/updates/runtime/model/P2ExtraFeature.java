@@ -21,6 +21,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -50,6 +51,7 @@ import org.eclipse.equinox.p2.repository.IRepositoryManager;
 import org.eclipse.equinox.p2.repository.artifact.IArtifactRepositoryManager;
 import org.eclipse.equinox.p2.repository.metadata.IMetadataRepositoryManager;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.PlatformUI;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
@@ -60,6 +62,7 @@ import org.talend.commons.utils.VersionUtils;
 import org.talend.updates.runtime.i18n.Messages;
 import org.talend.updates.runtime.service.ITaCoKitUpdateService;
 import org.talend.updates.runtime.service.ITaCoKitUpdateService.ICarInstallationResult;
+import org.talend.updates.runtime.ui.ImageFactory;
 import org.talend.updates.runtime.utils.PathUtils;
 import org.talend.updates.runtime.utils.TaCoKitCarUtils;
 import org.talend.utils.files.FileUtils;
@@ -95,6 +98,12 @@ public class P2ExtraFeature implements ExtraFeature {
     protected FeatureCategory parentCategory;
 
     protected boolean needRestart = true;
+
+    private Image image;
+
+    private Object imageLock = new Object();
+
+    private List<ICallBack> callBacks = Collections.synchronizedList(new LinkedList<>());
 
     protected P2ExtraFeature() {
         // do nothing be authorise subclasses to have a constructor
@@ -858,6 +867,49 @@ public class P2ExtraFeature implements ExtraFeature {
 
     protected File getTempUpdateSiteFolder() {
         return FileUtils.createTmpFolder("p2updatesite", null); //$NON-NLS-1$
+    }
+
+    protected List<ICallBack> getCallBacks() {
+        return callBacks;
+    }
+
+    @Override
+    public Image getImage(IProgressMonitor monitor) throws Exception {
+        if (image != null) {
+            return image;
+        }
+
+        synchronized (imageLock) {
+            if (image == null) {
+                image = ImageFactory.getInstance().createFeatureImage(downloadImage(monitor));
+            }
+        }
+        return image;
+    }
+
+    @Override
+    public File downloadImage(IProgressMonitor monitor) throws Exception {
+        for (ICallBack callBack : getCallBacks()) {
+            try {
+                File imageFile = callBack.downloadImage(monitor);
+                if (imageFile != null) {
+                    return imageFile;
+                }
+            } catch (Exception e) {
+                ExceptionHandler.process(e);
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public void addCallBack(ICallBack callBack) {
+        getCallBacks().add(callBack);
+    }
+
+    @Override
+    public void remoteCallBack(ICallBack callBack) {
+        getCallBacks().remove(callBack);
     }
 
 }

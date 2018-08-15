@@ -63,8 +63,8 @@ public class ComponentNexusP2ExtraFeature extends ComponentP2ExtraFeature {
     }
 
     public ComponentNexusP2ExtraFeature(String name, String version, String description, String product, String mvnURI,
-            String p2IuId) {
-        super(name, version, description, product, mvnURI, p2IuId);
+            String imageMvnURI, String p2IuId) {
+        super(name, version, description, product, mvnURI, imageMvnURI, p2IuId);
     }
 
     public String getNexusURL() {
